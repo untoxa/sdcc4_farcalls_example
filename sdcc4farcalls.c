@@ -18,7 +18,15 @@ int some_bank0_proc(int a, int b, int c) {
 } 
 
 void main() {
-    printf("far call example:\n");    
     SET_ROM_BANK(1);
+    // hello2 contains garbage, because bank1 is active, not bank2
+    printf("hello2: '%s'\n", hello2);
+    SET_ROM_BANK(2);
+    // now hello2 data is in place
+    printf("hello2: '%s'\n", hello2);
+    printf("far call example:\n");    
     printf("result: 0x%x\n", (int)some_bank2_proc(16, 32, 64) + some_bank0_proc(0, 8, 128) + some_bank1_proc(1, 2, 4));
+    // after far calls, bank should be restored:
+    printf("hello2: '%s'\n", hello2);
+    // yes!
 }
