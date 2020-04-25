@@ -68,8 +68,8 @@ def fix_far_calls(filename):
                 i = 5
                 while i < len(decoded_line):
                     mode = int(decoded_line[i], 16)
-                    if mode & 0xf0 != 0:
-                        sys.exit('ERROR: MODE ENCODING NOT SUPPORTED YET')
+                    if mode & 0xf0 == 0xf0:
+                        sys.exit('ERROR: MODE ENCODING NOT SUPPORTED YET Line:"{:s}"'.format(line))
                     if (mode & 2): # symbol detected
                         # decode previous line
                         tmp = [x.strip() for x in prev_line.split()]

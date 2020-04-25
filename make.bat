@@ -24,7 +24,8 @@
 @echo ASSEMBLING THE STUB...
 
 sdasgb %ASMFLAGS% %OBJ%\MBC1_RAM_INIT.rel MBC1_RAM_INIT.s
-@set LFILES=%LFILES% %OBJ%\MBC1_RAM_INIT.rel
+sdasgb %ASMFLAGS% %OBJ%\__sdcc_call_hl.rel __sdcc_call_hl.s
+@set LFILES=%LFILES% %OBJ%\MBC1_RAM_INIT.rel %OBJ%\__sdcc_call_hl.rel
 
 @echo COMPILING WITH SDCC4...
 
