@@ -18,19 +18,19 @@ result to stdout.
 
 The patch target is:
 
-call banked_call
-dw <far_function_offset>
-dw 0                     <--- HERE
+    call banked_call
+    dw <far_function_offset>
+    dw 0                     <--- HERE, the <bank_number>
 
 
 Postprocessor identifies a call  to banked_call, ensures that  it is really a call, identifies 
 that there is a 
 
-dw <far_function_offset> 
+    dw <far_function_offset> 
 
 after it (another reloc), finds a bank in the "name --> bank number" dict, patches the 
 
-dw <bank> 
+    dw <bank_number> 
 
 with a bank number.
 
@@ -44,14 +44,14 @@ how it is done.
 
 Your code in some .c file that is may be compiled, say, with -bo2 switch or a #pragma bank 2:
 
-int some_bank2_proc(int a, int b, int c) __banked {
-    printf("  in %s\n", hello2);
-    return a + b + c;
-}
+    int some_bank2_proc(int a, int b, int c) __banked {
+        printf("  in %s\n", hello2);
+        return a + b + c;
+    }
 
 and in the other place, say main(), you just call this function:
 
-int somevar = some_bank2_proc(16, 32, 64);
+    int somevar = some_bank2_proc(16, 32, 64);
 
 Compile both files. Fix the  object file  from which  the far call is made with  far_fixer.py, 
 by passing BOTH objects to it in the right order. You must fix EVERY object file, that contain 
