@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim: sts=4 sw=4 et
+# Description: Far call fixer for SDCC4 for gbz80 object files
+# Author: Tony Pavlov (untoxa)
+# SPDX-License-Identifier: MIT
+
 import sys
 from struct import unpack
 
