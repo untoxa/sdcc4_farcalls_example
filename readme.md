@@ -32,7 +32,9 @@ after it (another reloc), finds a bank in the "name --> bank number" dict, patch
 
     dw <bank_number> 
 
-with a bank number.
+with a bank number. You may see the results of patching on the screenshot below:
+
+![patching process result](/screenshot.png)
 
 This is the early alpha version  of a postprocessor, it may contain some bugs, so i appriciate 
 your help with testing and fixing it.
