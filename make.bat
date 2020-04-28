@@ -32,11 +32,15 @@ sdasgb %ASMFLAGS% %OBJ%__sdcc_call_hl.rel %SRC%__sdcc_call_hl.s
 
 sdcc %CFLAGS% %SRC%sdcc4bank1code.c -bo1 -o %OBJ%sdcc4bank1code.rel
 sdcc %CFLAGS% %SRC%sdcc4bank2code.c -bo2 -o %OBJ%sdcc4bank2code.rel
-@set LFILES=%LFILES% %OBJ%sdcc4bank1code.rel %OBJ%sdcc4bank2code.rel 
+
+@echo FIX: %OBJ%sdcc4bank2code.rel
+python far_fixer.py %LFILES% %OBJ%sdcc4bank2code.rel > %OBJ%sdcc4bank2code.fixed.rel
+
+@set LFILES=%LFILES% %OBJ%sdcc4bank1code.rel %OBJ%sdcc4bank2code.fixed.rel 
 
 sdcc %CFLAGS% %SRC%%PROJ%.c -o %OBJ%%PROJ%.rel
 
-@echo PATCHING...
+@echo FIX: %OBJ%%PROJ%.rel
 python far_fixer.py %LFILES% %OBJ%%PROJ%.rel > %OBJ%%PROJ%.fixed.rel
 
 @echo LINKING WITH GBDK...
