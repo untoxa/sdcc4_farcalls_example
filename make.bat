@@ -37,7 +37,7 @@ sdcc %CFLAGS% %SRC%sdcc4bank2code.c -bo2 -o %OBJ%sdcc4bank2code.rel
 sdcc %CFLAGS% %SRC%%PROJ%.c -o %OBJ%%PROJ%.rel
 
 @echo PATCHING...
-@python far_fixer.py %LFILES% %OBJ%%PROJ%.rel > %OBJ%%PROJ%.fixed.rel
+python far_fixer.py %LFILES% %OBJ%%PROJ%.rel > %OBJ%%PROJ%.fixed.rel
 
 @echo LINKING WITH GBDK...
 %GBDK%\bin\link-gbz80 %LFLAGS% %PROJ%.gb %LFILES% %OBJ%%PROJ%.fixed.rel 
