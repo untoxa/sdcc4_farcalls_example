@@ -39,7 +39,7 @@ void main() {
     printf("hello2:'%s' ERR!\n", hello2);
     SET_ROM_BANK(2);
     // now hello2 data is in place
-    printf("hello2:'%s'\n", hello2);
+    printf("hello2:'%s' OK!\n", hello2);
     printf("FAR CALL EXAMPLE:\n");    
     printf("result: 0x%x\n", (int)some_bank2_proc(16, 32, 64) + some_bank0_proc(0, 8, 128) + some_bank1_proc(1, 2, 4));
     // after far calls, bank should be restored:

@@ -53,7 +53,7 @@ def fix_far_calls(filename):
                 symbols.append([])
                 area_idx += 1
             elif type == 'S':
-                symbols[area_idx].append(decoded_line[1])
+                symbols[area_idx].append([decoded_line[1], decoded_line[2]])
             elif type == 'T':
                 last_last_T = last_T
                 last_T = int(decoded_line[-1], 16)
@@ -77,31 +77,47 @@ def fix_far_calls(filename):
                         # global symbol detected
                         current_area = 0
                         idx = int(decoded_line[i + 3], 16) << 8 | int(decoded_line[i + 2], 16)
+                        ofs = int(decoded_line[i + 1], 16)
                     else:
-                        # area/symbol detected
-                        current_area = int(decoded_line[i + 2], 16) + 1
-                        idx = int(decoded_line[i + 3], 16) 
+                        # area detected
+                        current_area = int(decoded_line[i + 3], 16) << 8 | int(decoded_line[i + 2], 16)
+                        # symbols[0] are globals
+                        current_area += 1
 
-                    ofs = int(decoded_line[i + 1], 16)
+                        ofs = int(decoded_line[i + 1], 16)
+                        rel_ofs = int(prev_decoded_line[ofs + 2], 16) << 8 | int(prev_decoded_line[ofs + 1], 16)
+
+                        idx = -1
+                        
+                        # try to search a name by an offset
+                        temp_idx = 0
+                        for sym in symbols[current_area]:
+                            if sym[1] == 'Def{:04x}'.format(rel_ofs): 
+                                idx = temp_idx
+                            temp_idx += 1
                     
-                    if not farcall_detected:
-                        if symbols[current_area][idx] == 'banked_call':
-                            # we need to check, that it is a call, not "dw #banked_call"
-                            # "db 0xCD dw #banked_call" case is not supported, don't do this!
-                            farcall_detected = ((int(prev_decoded_line[ofs], 16) if ofs > 2 else last_last_T) in [0xCD, 0xDC, 0xD4, 0xC4, 0xCC])
-                    else:
-                        bank = banks_by_symbol.get(symbols[current_area][idx])
-                        if bank is not None:
-                            patch_ofs = ofs + 1 + 2
-                            patch_value = '{:02X}'.format(bank[0])
-                            patch_message = 'patching call to {:s} into _{:s}_{:d}'.format(symbols[current_area][idx], 'CODE' if bank[1] == 0 else 'DATA', bank[0])
-                            if patch_ofs < len(prev_decoded_line):
-                                prev_decoded_line[patch_ofs] = patch_value
-                                prev_line = ' '.join(prev_decoded_line) + '\n'
-                                sys.stderr.write('{:s}\n'.format(patch_message))
-                            patch_ofs = patch_ofs - len(prev_decoded_line) 
+                    if idx >= 0:                   
+                        if not farcall_detected:
+                            if symbols[current_area][idx][0] == 'banked_call':
+                                # we need to check, that it is a call, not "dw #banked_call"
+                                # "db 0xCD dw #banked_call" case is not supported, don't do this!
+                                farcall_detected = ((int(prev_decoded_line[ofs], 16) if ofs > 2 else last_last_T) in [0xCD, 0xDC, 0xD4, 0xC4, 0xCC])
                         else:
-                            sys.stderr.write('WARNING: SYMBOL {:s} NOT FOUND Line:"{:s}"\n'.format(symbols[current_area][idx], line))
+                            bank = banks_by_symbol.get(symbols[current_area][idx][0])
+                            if bank is not None:
+                                patch_ofs = ofs + 1 + 2
+                                patch_value = '{:02X}'.format(bank[0])
+
+                                patch_message = 'patching call to {:s} into _{:s}_{:d}'.format(symbols[current_area][idx][0], 'CODE' if bank[1] == 0 else 'DATA', bank[0])
+                                if patch_ofs < len(prev_decoded_line):
+                                    prev_decoded_line[patch_ofs] = patch_value
+                                    prev_line = ' '.join(prev_decoded_line) + '\n'
+                                    sys.stderr.write('{:s}\n'.format(patch_message))
+                                patch_ofs = patch_ofs - len(prev_decoded_line) 
+                            else:
+                                sys.stderr.write('WARNING: SYMBOL {:s} NOT FOUND Line:"{:s}"\n'.format(symbols[current_area][idx][0], line))
+                            farcall_detected = False
+                    else:
                         farcall_detected = False
                     i += 4
             # output previous line (patched or not)
@@ -115,7 +131,7 @@ def fix_far_calls(filename):
     return
 
 if len(sys.argv) <= 1:
-    sys.exit(('FAR CALL FIXER v0.2a\n'
+    sys.exit(('FAR CALL FIXER v0.3a\n'
               '  USAGE: far_fixer.py <file1.rel> <file2.rel> ...\n'
               '  The last file in the list will be fixed and dumped to stdout'))
 
