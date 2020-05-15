@@ -92,7 +92,7 @@ def fix_far_calls(filename):
                         # try to search a name by an offset
                         temp_idx = 0
                         for sym in symbols[current_area]:
-                            if sym[1] == 'Def{:04x}'.format(rel_ofs): 
+                            if sym[1].lower() == 'def{:04x}'.format(rel_ofs).lower(): 
                                 idx = temp_idx
                             temp_idx += 1
                     
