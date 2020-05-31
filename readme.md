@@ -1,5 +1,12 @@
 SDCC4 for gbz80 Far call with transparent bank switching example
-----------------------------------------------------------------
+================================================================
+
+Features were implemented in the latest GBDK-2020 releases. You don't need this now, just use latest GBDK - everything is fixed automatically by the linker.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Link to GBDK-2020: https://github.com/Zal0/gbdk-2020
+
+The description below explains the mechanism.
 
 I was digging into the sdcc, and found out, that transparent bank switching is almost working! 
 It was always! The only  thing that was missing - a correct bank number in the structure, that 
